@@ -1,133 +1,254 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Amazon EU Price Comparator</title>
+  <meta name="description" content="Compare Amazon prices across EU countries. Find the best deals on Amazon ES, FR, DE, IT, UK.">
+  <title>Amazon EU Price Comparator - Compare Preços</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
 
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --secondary: #8b5cf6;
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --dark: #1f2937;
+      --light: #f9fafb;
+      --white: #ffffff;
+      --gray: #6b7280;
+      --border: #e5e7eb;
+    }
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background-attachment: fixed;
       min-height: 100vh;
       padding: 20px;
+      color: var(--dark);
     }
 
     .container {
-      max-width: 1200px;
+      max-width: 1400px;
       margin: 0 auto;
     }
 
+    /* Header */
     .header {
       text-align: center;
       color: white;
-      margin-bottom: 40px;
+      margin-bottom: 50px;
+      animation: fadeInDown 0.6s ease-out;
     }
 
     .header h1 {
-      font-size: 2.5em;
-      margin-bottom: 10px;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+      font-size: 3.5em;
+      font-weight: 800;
+      margin-bottom: 15px;
+      text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      background: linear-gradient(135deg, #fff 0%, #e0e7ff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     .header p {
-      font-size: 1.1em;
-      opacity: 0.9;
+      font-size: 1.3em;
+      opacity: 0.95;
+      font-weight: 300;
+      letter-spacing: 0.5px;
     }
 
+    .header .subtitle {
+      margin-top: 10px;
+      font-size: 0.9em;
+      opacity: 0.8;
+    }
+
+    /* Search Section */
     .search-section {
-      background: white;
-      border-radius: 12px;
-      padding: 30px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-      margin-bottom: 30px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 24px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      margin-bottom: 40px;
+      animation: fadeInUp 0.6s ease-out;
     }
 
     .form-group {
-      margin-bottom: 20px;
+      margin-bottom: 25px;
     }
 
     label {
       display: block;
-      margin-bottom: 8px;
+      margin-bottom: 12px;
       font-weight: 600;
-      color: #333;
+      color: var(--dark);
+      font-size: 1.1em;
     }
 
-    input, select {
+    .input-wrapper {
+      position: relative;
+    }
+
+    input {
       width: 100%;
-      padding: 12px;
-      border: 2px solid #e0e0e0;
-      border-radius: 8px;
+      padding: 18px 24px;
+      border: 2px solid var(--border);
+      border-radius: 16px;
       font-size: 16px;
-      transition: border-color 0.3s;
+      transition: all 0.3s;
+      background: var(--white);
+      font-family: 'Inter', sans-serif;
     }
 
-    input:focus, select:focus {
+    input:focus {
       outline: none;
-      border-color: #667eea;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .input-icon {
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.5em;
+      color: var(--gray);
+    }
+
+    .help-text {
+      color: var(--gray);
+      font-size: 0.9em;
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .flags {
+      display: inline-flex;
+      gap: 4px;
+      font-size: 1.2em;
     }
 
     .button-group {
       display: flex;
-      gap: 10px;
+      gap: 15px;
+      margin-top: 30px;
     }
 
     button {
       flex: 1;
-      padding: 14px 24px;
+      padding: 18px 32px;
       border: none;
-      border-radius: 8px;
+      border-radius: 16px;
       font-size: 16px;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.3s;
+      font-family: 'Inter', sans-serif;
+      position: relative;
+      overflow: hidden;
+    }
+
+    button::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.3);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    button:hover::before {
+      width: 300px;
+      height: 300px;
     }
 
     .btn-primary {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
       color: white;
+      box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
     }
 
     .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+      transform: translateY(-3px);
+      box-shadow: 0 15px 35px rgba(99, 102, 241, 0.5);
+    }
+
+    .btn-primary:active {
+      transform: translateY(-1px);
     }
 
     .btn-secondary {
-      background: #f0f0f0;
-      color: #333;
+      background: var(--light);
+      color: var(--dark);
+      border: 2px solid var(--border);
     }
 
     .btn-secondary:hover {
-      background: #e0e0e0;
+      background: var(--border);
+      transform: translateY(-2px);
     }
 
     button:disabled {
       opacity: 0.6;
       cursor: not-allowed;
+      transform: none !important;
     }
 
+    /* Loading */
     .loading {
       text-align: center;
-      padding: 40px;
+      padding: 60px 20px;
       color: white;
-      font-size: 1.2em;
+      animation: fadeIn 0.4s;
+    }
+
+    .loading-content {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 40px;
+      display: inline-block;
     }
 
     .spinner {
-      border: 4px solid rgba(255,255,255,0.3);
-      border-top: 4px solid white;
+      border: 5px solid rgba(255,255,255,0.3);
+      border-top: 5px solid white;
       border-radius: 50%;
-      width: 40px;
-      height: 40px;
+      width: 60px;
+      height: 60px;
       animation: spin 1s linear infinite;
       margin: 0 auto 20px;
+    }
+
+    .loading-text {
+      font-size: 1.2em;
+      font-weight: 500;
+      margin-top: 20px;
+    }
+
+    .loading-subtext {
+      font-size: 0.9em;
+      opacity: 0.8;
+      margin-top: 10px;
     }
 
     @keyframes spin {
@@ -135,124 +256,381 @@
       100% { transform: rotate(360deg); }
     }
 
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Stats Bar */
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+      animation: fadeInUp 0.8s ease-out;
+    }
+
+    .stat-card {
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      transition: transform 0.3s;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .stat-value {
+      font-size: 2em;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 5px;
+    }
+
+    .stat-label {
+      color: var(--gray);
+      font-size: 0.9em;
+      font-weight: 500;
+    }
+
+    /* Comparison Summary */
+    .comparison-summary {
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 24px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+      margin-bottom: 40px;
+      animation: fadeInUp 0.8s ease-out;
+    }
+
+    .summary-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .summary-title {
+      font-size: 2em;
+      font-weight: 700;
+      color: var(--dark);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .summary-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      overflow: hidden;
+      border-radius: 16px;
+    }
+
+    .summary-table thead {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      color: white;
+    }
+
+    .summary-table th {
+      padding: 18px 20px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.95em;
+      letter-spacing: 0.5px;
+    }
+
+    .summary-table td {
+      padding: 20px;
+      border-bottom: 1px solid var(--border);
+      background: white;
+    }
+
+    .summary-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .summary-table tbody tr {
+      transition: all 0.2s;
+    }
+
+    .summary-table tbody tr:hover {
+      background: var(--light);
+      transform: scale(1.01);
+    }
+
+    .best-price {
+      background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%) !important;
+      font-weight: 600;
+      position: relative;
+    }
+
+    .best-price::before {
+      content: '🏆';
+      position: absolute;
+      left: 10px;
+      font-size: 1.2em;
+    }
+
+    .best-price td:first-child {
+      padding-left: 40px;
+    }
+
+    .country-cell {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+    }
+
+    .price-cell {
+      font-size: 1.2em;
+      font-weight: 700;
+    }
+
+    .price-original {
+      color: var(--dark);
+    }
+
+    .price-eur {
+      color: var(--success);
+      font-size: 1.1em;
+    }
+
+    .link-cell a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 8px;
+      background: rgba(99, 102, 241, 0.1);
+      transition: all 0.3s;
+      display: inline-block;
+    }
+
+    .link-cell a:hover {
+      background: var(--primary);
+      color: white;
+      transform: translateX(3px);
+    }
+
+    /* Product Cards */
     .results {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 25px;
+      animation: fadeInUp 1s ease-out;
     }
 
     .product-card {
-      background: white;
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 25px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .product-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+      transform: scaleX(0);
       transition: transform 0.3s;
     }
 
     .product-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      transform: translateY(-8px);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.2);
     }
 
-    .product-card.error {
-      border-left: 4px solid #e74c3c;
+    .product-card:hover::before {
+      transform: scaleX(1);
     }
 
     .product-card.success {
-      border-left: 4px solid #27ae60;
+      border: 2px solid var(--success);
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(255,255,255,0.95) 100%);
+    }
+
+    .product-card.success::before {
+      background: linear-gradient(90deg, var(--success) 0%, #34d399 100%);
+      transform: scaleX(1);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
     }
 
     .country-flag {
-      font-size: 2em;
-      margin-bottom: 10px;
+      font-size: 2.5em;
+    }
+
+    .badge {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.75em;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-best {
+      background: linear-gradient(135deg, var(--success) 0%, #34d399 100%);
+      color: white;
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
     }
 
     .product-title {
       font-size: 1.1em;
       font-weight: 600;
-      margin-bottom: 15px;
-      color: #333;
-      line-height: 1.4;
+      margin-bottom: 20px;
+      color: var(--dark);
+      line-height: 1.5;
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
+      min-height: 3em;
+    }
+
+    .product-price-section {
+      margin-bottom: 15px;
     }
 
     .product-price {
-      font-size: 1.8em;
-      font-weight: 700;
-      color: #667eea;
-      margin-bottom: 10px;
+      font-size: 2.2em;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 8px;
     }
 
-    .product-details {
-      color: #666;
-      font-size: 0.9em;
-      margin-bottom: 5px;
+    .product-price-eur {
+      font-size: 1.1em;
+      color: var(--success);
+      font-weight: 600;
     }
 
-    .product-image {
-      width: 100%;
-      height: 200px;
-      object-fit: contain;
-      border-radius: 8px;
-      margin-bottom: 15px;
-      background: #f5f5f5;
-    }
-
-    .error-message {
-      color: #e74c3c;
-      padding: 20px;
-      background: #fee;
-      border-radius: 8px;
+    .product-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
       margin-top: 20px;
-    }
-
-    .success-message {
-      color: #27ae60;
-      padding: 20px;
-      background: #efe;
-      border-radius: 8px;
-      margin-top: 20px;
-    }
-
-    .comparison-summary {
-      background: white;
+      padding: 12px 24px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      color: white;
+      text-decoration: none;
       border-radius: 12px;
-      padding: 30px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-      margin-bottom: 30px;
-    }
-
-    .summary-title {
-      font-size: 1.5em;
-      font-weight: 700;
-      margin-bottom: 20px;
-      color: #333;
-    }
-
-    .summary-table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    .summary-table th,
-    .summary-table td {
-      padding: 12px;
-      text-align: left;
-      border-bottom: 1px solid #e0e0e0;
-    }
-
-    .summary-table th {
-      background: #f5f5f5;
       font-weight: 600;
-      color: #333;
+      transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
     }
 
-    .best-price {
-      background: #e8f5e9;
-      font-weight: 600;
+    .product-link:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+    }
+
+    /* Error Message */
+    .error-message {
+      background: rgba(239, 68, 68, 0.1);
+      border: 2px solid var(--danger);
+      color: var(--danger);
+      padding: 25px;
+      border-radius: 16px;
+      margin-top: 20px;
+      text-align: center;
+      font-weight: 500;
+      animation: fadeInUp 0.5s;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header h1 {
+        font-size: 2.5em;
+      }
+
+      .search-section {
+        padding: 25px;
+      }
+
+      .button-group {
+        flex-direction: column;
+      }
+
+      .summary-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .summary-table {
+        font-size: 0.9em;
+      }
+
+      .summary-table th,
+      .summary-table td {
+        padding: 12px;
+      }
+
+      .results {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(255,255,255,0.1);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.3);
+      border-radius: 5px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255,255,255,0.5);
     }
   </style>
 </head>
@@ -260,33 +638,46 @@
   <div class="container">
     <div class="header">
       <h1>🛒 Amazon EU Price Comparator</h1>
-      <p>Compare prices across different Amazon EU marketplaces</p>
+      <p>Compare preços em todas as Amazon da Europa</p>
+      <p class="subtitle">Encontre o melhor preço em 🇪🇸 ES, 🇫🇷 FR, 🇩🇪 DE, 🇮🇹 IT, 🇬🇧 UK</p>
     </div>
 
     <div class="search-section">
       <div class="form-group">
-        <label for="query">Product Search</label>
-        <input 
-          type="text" 
-          id="query" 
-          placeholder="e.g., iPhone 15, AirPods, B08N5WRWNW" 
-          required
-        />
-        <small style="color: #666; display: block; margin-top: 5px;">
-          Search by product name or ASIN. Comparing: 🇪🇸 ES, 🇫🇷 FR, 🇩🇪 DE, 🇮🇹 IT, 🇬🇧 UK
-        </small>
+        <label for="query">🔍 Pesquisar Produto</label>
+        <div class="input-wrapper">
+          <input 
+            type="text" 
+            id="query" 
+            placeholder="Ex: iPhone 15, AirPods Pro, B08N5WRWNW..." 
+            required
+            autocomplete="off"
+          />
+          <span class="input-icon">🔎</span>
+        </div>
+        <div class="help-text">
+          <span>Podes pesquisar por nome do produto ou ASIN</span>
+          <span class="flags">🇪🇸 🇫🇷 🇩🇪 🇮🇹 🇬🇧</span>
+        </div>
       </div>
 
       <div class="button-group">
-        <button class="btn-primary" onclick="comparePrices()">Compare Prices</button>
-        <button class="btn-secondary" onclick="clearResults()">Clear Results</button>
+        <button class="btn-primary" onclick="comparePrices()">
+          <span>Comparar Preços</span>
+        </button>
+        <button class="btn-secondary" onclick="clearResults()">
+          Limpar
+        </button>
       </div>
     </div>
 
     <div id="loading" style="display: none;">
       <div class="loading">
-        <div class="spinner"></div>
-        <p>Scraping Amazon prices... This may take a moment.</p>
+        <div class="loading-content">
+          <div class="spinner"></div>
+          <div class="loading-text">A procurar os melhores preços...</div>
+          <div class="loading-subtext">Isto pode demorar 30-60 segundos</div>
+        </div>
       </div>
     </div>
 
@@ -298,21 +689,23 @@
       const query = document.getElementById('query').value.trim();
 
       if (!query) {
-        alert('Please enter a product name or ASIN');
+        alert('Por favor, insere um produto ou ASIN');
         return;
       }
 
-      // Show loading
+      const btn = document.querySelector('.btn-primary');
+      btn.disabled = true;
+      btn.innerHTML = '<span>⏳ A processar...</span>';
+
       document.getElementById('loading').style.display = 'block';
       document.getElementById('results').innerHTML = '';
 
       try {
         const response = await fetch(`/compare?q=${encodeURIComponent(query)}`);
-
         const data = await response.json();
 
         if (!response.ok) {
-          throw new Error(data.error || 'Failed to fetch data');
+          throw new Error(data.error || 'Erro ao buscar dados');
         }
 
         displayResults(data, query);
@@ -320,52 +713,102 @@
       } catch (error) {
         document.getElementById('results').innerHTML = `
           <div class="error-message">
-            <strong>Error:</strong> ${error.message}
+            <strong>❌ Erro:</strong> ${error.message}
           </div>
         `;
       } finally {
         document.getElementById('loading').style.display = 'none';
+        btn.disabled = false;
+        btn.innerHTML = '<span>Comparar Preços</span>';
       }
     }
 
     function displayResults(data, query) {
       const resultsDiv = document.getElementById('results');
       
-      // Data is now a direct array, sorted by priceEUR
       if (!data || data.length === 0) {
         resultsDiv.innerHTML = `
           <div class="error-message">
-            No prices found. The product might not be available in the selected countries.
+            Nenhum preço encontrado. O produto pode não estar disponível nos países selecionados.
           </div>
         `;
         return;
       }
 
-      // Build comparison summary
+      // Calculate stats
+      const prices = data.map(item => item.priceEUR);
+      const minPrice = Math.min(...prices);
+      const maxPrice = Math.max(...prices);
+      const avgPrice = prices.reduce((a, b) => a + b, 0) / prices.length;
+      const savings = maxPrice - minPrice;
+
+      // Stats bar
+      let statsHTML = `
+        <div class="stats-bar">
+          <div class="stat-card">
+            <div class="stat-value">€${minPrice.toFixed(2)}</div>
+            <div class="stat-label">💰 Melhor Preço</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">€${maxPrice.toFixed(2)}</div>
+            <div class="stat-label">📈 Preço Máximo</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">€${avgPrice.toFixed(2)}</div>
+            <div class="stat-label">📊 Preço Médio</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">€${savings.toFixed(2)}</div>
+            <div class="stat-label">💵 Poupança Máxima</div>
+          </div>
+        </div>
+      `;
+
+      // Comparison summary
       let summaryHTML = `
         <div class="comparison-summary">
-          <div class="summary-title">📊 Price Comparison Summary (sorted by EUR price)</div>
+          <div class="summary-header">
+            <div class="summary-title">
+              📊 Comparação de Preços
+              <span style="font-size: 0.6em; font-weight: 400; color: var(--gray);">(ordenado por EUR)</span>
+            </div>
+          </div>
           <table class="summary-table">
             <thead>
               <tr>
-                <th>Country</th>
-                <th>Price</th>
-                <th>Price (EUR)</th>
-                <th>Link</th>
+                <th>País</th>
+                <th>Preço Original</th>
+                <th>Preço (EUR)</th>
+                <th>Ação</th>
               </tr>
             </thead>
             <tbody>
       `;
 
       data.forEach((item, index) => {
-        const isBestPrice = index === 0; // First item is cheapest
+        const isBestPrice = index === 0;
+        const savingsPercent = ((maxPrice - item.priceEUR) / maxPrice * 100).toFixed(1);
         
         summaryHTML += `
           <tr ${isBestPrice ? 'class="best-price"' : ''}>
-            <td>${item.country}</td>
-            <td><strong>${item.currency} ${item.price.toFixed(2)}</strong></td>
-            <td>€${item.priceEUR.toFixed(2)}</td>
-            <td><a href="${item.link}" target="_blank">View →</a></td>
+            <td>
+              <div class="country-cell">
+                ${getCountryFlagFromName(item.country)}
+                <span>${item.country.replace(/[🇪🇸🇫🇷🇩🇪🇮🇹🇬🇧]/g, '').trim()}</span>
+              </div>
+            </td>
+            <td class="price-cell price-original">
+              <strong>${item.currency} ${item.price.toFixed(2)}</strong>
+            </td>
+            <td class="price-cell price-eur">
+              <strong>€${item.priceEUR.toFixed(2)}</strong>
+              ${index === 0 ? '<span style="color: var(--success); font-size: 0.8em;"> 🏆 Melhor!</span>' : ''}
+            </td>
+            <td class="link-cell">
+              <a href="${item.link}" target="_blank" rel="noopener noreferrer">
+                Ver na Amazon →
+              </a>
+            </td>
           </tr>
         `;
       });
@@ -376,28 +819,35 @@
         </div>
       `;
 
-      // Build product cards
+      // Product cards
       let cardsHTML = '<div class="results">';
       
       data.forEach((item, index) => {
         const isBestPrice = index === 0;
+        const savingsPercent = ((maxPrice - item.priceEUR) / maxPrice * 100).toFixed(1);
         
         cardsHTML += `
           <div class="product-card ${isBestPrice ? 'success' : ''}">
-            <div class="country-flag">${getCountryFlagFromName(item.country)}</div>
-            ${isBestPrice ? '<div style="color: #27ae60; font-weight: 600; margin-bottom: 10px;">🏆 Best Price!</div>' : ''}
-            <div class="product-title">${item.title || 'No title available'}</div>
-            <div class="product-price">${item.currency} ${item.price.toFixed(2)}</div>
-            <div class="product-details" style="color: #27ae60; font-weight: 600;">
-              €${item.priceEUR.toFixed(2)} (converted to EUR)
+            <div class="card-header">
+              <div class="country-flag">${getCountryFlagFromName(item.country)}</div>
+              ${isBestPrice ? '<span class="badge badge-best">🏆 Melhor Preço</span>' : ''}
             </div>
-            <a href="${item.link}" target="_blank" style="display: inline-block; margin-top: 15px; color: #667eea; text-decoration: none; font-weight: 600;">View on Amazon →</a>
+            <div class="product-title">${item.title || 'Sem título disponível'}</div>
+            <div class="product-price-section">
+              <div class="product-price">${item.currency} ${item.price.toFixed(2)}</div>
+              <div class="product-price-eur">€${item.priceEUR.toFixed(2)} (em EUR)</div>
+              ${index > 0 ? `<div style="color: var(--gray); font-size: 0.9em; margin-top: 5px;">${savingsPercent}% mais caro que o melhor</div>` : ''}
+            </div>
+            <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="product-link">
+              Ver na Amazon
+              <span>→</span>
+            </a>
           </div>
         `;
       });
 
       cardsHTML += '</div>';
-      resultsDiv.innerHTML = summaryHTML + cardsHTML;
+      resultsDiv.innerHTML = statsHTML + summaryHTML + cardsHTML;
     }
 
     function getCountryFlagFromName(countryName) {
@@ -409,30 +859,22 @@
       return '🌍';
     }
 
-    function getCountryFlag(country) {
-      const flags = {
-        'uk': '🇬🇧',
-        'de': '🇩🇪',
-        'fr': '🇫🇷',
-        'it': '🇮🇹',
-        'es': '🇪🇸',
-        'nl': '🇳🇱',
-        'pl': '🇵🇱',
-        'se': '🇸🇪'
-      };
-      return flags[country.toLowerCase()] || '🌍';
-    }
-
     function clearResults() {
       document.getElementById('results').innerHTML = '';
       document.getElementById('query').value = '';
+      document.getElementById('query').focus();
     }
 
-    // Allow Enter key to submit
+    // Enter key to submit
     document.getElementById('query').addEventListener('keypress', function(e) {
       if (e.key === 'Enter') {
         comparePrices();
       }
+    });
+
+    // Focus input on load
+    window.addEventListener('load', () => {
+      document.getElementById('query').focus();
     });
   </script>
 </body>

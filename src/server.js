@@ -30,7 +30,7 @@ app.use(express.static(path.join(__dirname, "..", "public")));
 
 
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 
 const cache = new Map(); // Cache para armazenar resultados
 
@@ -136,9 +136,6 @@ app.get("/", (_,res)=>{
 
 
 
-app.listen(PORT, ()=> {
-
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-  console.log(`📍 Endpoints: GET /compare?q=... and GET /`);
-
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
 });

@@ -209,9 +209,8 @@ export async function launchBrowser() {
       "--disable-setuid-sandbox",
       "--disable-dev-shm-usage",
       "--disable-gpu",
-      "--disable-software-rasterizer",
-      ...(process.env.NODE_ENV === 'production' ? ['--single-process'] : [])
-    ]
+      "--single-process",
+    ],
   });
   return browser;
 }
