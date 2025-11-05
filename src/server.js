@@ -1,7 +1,9 @@
-// Log inicial para debug
-console.log('📦 Iniciando servidor...');
-console.log('📦 Node version:', process.version);
-console.log('📦 CWD:', process.cwd());
+// Log inicial para debug - DEVE aparecer primeiro
+process.stdout.write('SERVER: Starting...\n');
+process.stderr.write('SERVER: Starting (stderr)\n');
+console.log('SERVER: Node version:', process.version);
+console.log('SERVER: CWD:', process.cwd());
+console.log('SERVER: PORT:', process.env.PORT || 'not set');
 
 import "dotenv/config";
 
