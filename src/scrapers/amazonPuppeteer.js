@@ -343,9 +343,56 @@ export async function scrapeAmazonSite({ domain, country, currency }, query, bro
 export async function launchBrowser() {
   console.log('🌐 Iniciando Puppeteer...');
   
-  const browser = await puppeteer.launch({
+  let executablePath = process.env.PUPPETEER_EXECUTABLE_PATH;
+  
+  // Se não especificado, tenta encontrar o Chrome no cache do Render
+  if (!executablePath) {
+    try {
+      const fs = await import('fs');
+      const path = await import('path');
+      
+      const cacheBase = '/opt/render/.cache/puppeteer';
+      if (fs.existsSync(cacheBase)) {
+        // Procura em subdiretórios
+        const dirs = fs.readdirSync(cacheBase);
+        for (const dir of dirs) {
+          const chromeDir = path.join(cacheBase, dir);
+          if (fs.statSync(chromeDir).isDirectory()) {
+            // Procura pelo executável chrome
+            const findChrome = (dirPath) => {
+              try {
+                const entries = fs.readdirSync(dirPath, { withFileTypes: true });
+                for (const entry of entries) {
+                  const fullPath = path.join(dirPath, entry.name);
+                  if (entry.isDirectory()) {
+                    const found = findChrome(fullPath);
+                    if (found) return found;
+                  } else if (entry.name === 'chrome' || entry.name === 'chrome-linux') {
+                    return fullPath;
+                  }
+                }
+              } catch (e) {
+                return null;
+              }
+              return null;
+            };
+            
+            const chromePath = findChrome(chromeDir);
+            if (chromePath && fs.existsSync(chromePath)) {
+              executablePath = chromePath;
+              console.log(`✅ Chrome encontrado em: ${executablePath}`);
+              break;
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('⚠️ Não foi possível encontrar Chrome automaticamente:', e.message);
+    }
+  }
+  
+  const launchOptions = {
     headless: "new",
-    executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || "/opt/render/.cache/puppeteer/chrome/linux-*/chrome",
     args: [
       "--no-sandbox",
       "--disable-setuid-sandbox",
@@ -354,7 +401,16 @@ export async function launchBrowser() {
       "--single-process",
       "--no-zygote",
     ],
-  });
+  };
+  
+  if (executablePath) {
+    launchOptions.executablePath = executablePath;
+    console.log(`📁 Usando Chrome em: ${executablePath}`);
+  } else {
+    console.log('⚠️ Usando Chrome padrão do Puppeteer (sem executablePath)');
+  }
+  
+  const browser = await puppeteer.launch(launchOptions);
   
   console.log('✅ Puppeteer iniciado com sucesso');
   return browser;
