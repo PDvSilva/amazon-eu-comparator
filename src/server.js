@@ -28,10 +28,17 @@ let launchBrowser, scrapeAmazonSite;
 async function loadScraper() {
   if (!launchBrowser) {
     console.log('📦 Carregando scraper (lazy)...');
-    const scraperModule = await import("./scrapers/amazonPuppeteer.js");
-    launchBrowser = scraperModule.launchBrowser;
-    scrapeAmazonSite = scraperModule.scrapeAmazonSite;
-    console.log('✅ Scraper carregado com sucesso');
+    try {
+      const scraperModule = await import("./scrapers/amazonPuppeteer.js");
+      launchBrowser = scraperModule.launchBrowser;
+      scrapeAmazonSite = scraperModule.scrapeAmazonSite;
+      console.log('✅ Scraper carregado com sucesso');
+      console.log('✅ launchBrowser:', typeof launchBrowser);
+      console.log('✅ scrapeAmazonSite:', typeof scrapeAmazonSite);
+    } catch (error) {
+      console.error('❌ Erro ao carregar scraper:', error);
+      throw error;
+    }
   }
   return { launchBrowser, scrapeAmazonSite };
 }
@@ -133,10 +140,22 @@ async function runScrape(q) {
   // Carrega o scraper apenas quando necessário
   let browser;
   try {
+    console.log('📥 Chamando loadScraper()...');
     const { launchBrowser: lb, scrapeAmazonSite: sas } = await loadScraper();
     console.log('📦 Scraper carregado, iniciando browser...');
+    console.log('📦 Tipo de lb:', typeof lb);
     
-    browser = await lb();
+    if (typeof lb !== 'function') {
+      throw new Error('launchBrowser não é uma função');
+    }
+    
+    console.log('🌐 Chamando launchBrowser()...');
+    browser = await Promise.race([
+      lb(),
+      new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Puppeteer timeout após 30s')), 30000)
+      )
+    ]);
     console.log('✅ Browser iniciado');
     
     const limit = pLimit(2); // limitar concorrência para evitar bloqueios

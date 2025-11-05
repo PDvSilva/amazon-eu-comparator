@@ -42,9 +42,13 @@ export function parsePrice(text) {
 
 /** Scrape do primeiro resultado com preço para um domínio Amazon */
 export async function scrapeAmazonSite({ domain, country, currency }, query, browser) {
+  console.log(`📄 scrapeAmazonSite chamado para ${country} (${domain}) - "${query}"`);
   const url = `https://${domain}/s?k=${encodeURIComponent(query)}`;
+  console.log(`🔗 URL: ${url}`);
 
+  console.log(`📄 Criando nova página...`);
   const page = await browser.newPage();
+  console.log(`✅ Página criada`);
 
   try {
     await page.setUserAgent(
