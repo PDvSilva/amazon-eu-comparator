@@ -407,8 +407,16 @@ export async function launchBrowser() {
     launchOptions.executablePath = executablePath;
     console.log(`📁 Usando Chrome em: ${executablePath}`);
   } else {
-    console.log('⚠️ Usando Chrome padrão do Puppeteer (sem executablePath)');
+    console.log('⚠️ Chrome não encontrado no cache, tentando usar padrão do Puppeteer');
+    // Não especifica executablePath - deixa o Puppeteer encontrar automaticamente
+    // O Puppeteer deve ter instalado o Chrome durante o build
   }
+  
+  console.log('📦 Launch options:', JSON.stringify({ 
+    headless: launchOptions.headless, 
+    hasExecutablePath: !!launchOptions.executablePath,
+    argsCount: launchOptions.args.length 
+  }));
   
   const browser = await puppeteer.launch(launchOptions);
   
