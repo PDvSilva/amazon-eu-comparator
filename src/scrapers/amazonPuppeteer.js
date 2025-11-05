@@ -344,7 +344,8 @@ export async function launchBrowser() {
   console.log("🚀 Starting Puppeteer on Render (installed Chrome)...");
 
   const executablePath =
-    process.env.PUPPETEER_EXECUTABLE_PATH || puppeteer.executablePath();
+    process.env.PUPPETEER_EXECUTABLE_PATH ||
+    "/opt/render/.cache/puppeteer/chrome/linux-127.0.6533.88/chrome-linux64/chrome";
 
   console.log("🧭 Chrome path:", executablePath);
 
