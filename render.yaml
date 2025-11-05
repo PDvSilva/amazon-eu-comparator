@@ -4,15 +4,8 @@ services:
     env: node
     plan: free
     region: frankfurt
-    buildCommand: |
-      rm -rf /opt/render/.cache/puppeteer
-      npm install
-      npx puppeteer browsers install chrome
+    buildCommand: npm install
     startCommand: npm start
     envVars:
       - key: PORT
         value: 10000
-      - key: PUPPETEER_CACHE_DIR
-        value: /opt/render/.cache/puppeteer
-      - key: PUPPETEER_EXECUTABLE_PATH
-        value: /opt/render/.cache/puppeteer/chrome/linux-127.0.6533.88/chrome
