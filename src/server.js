@@ -205,6 +205,16 @@ app.get("/api/health", (req, res) => {
   });
 });
 
+// Endpoint de teste simples
+app.get("/api/test", (req, res) => {
+  console.log("✅ Test endpoint called");
+  res.json({ 
+    status: "ok", 
+    message: "Server is working",
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Error handler global
 process.on('uncaughtException', (error) => {
   console.error('❌ Uncaught Exception:', error);
