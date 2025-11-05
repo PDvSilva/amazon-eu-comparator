@@ -405,10 +405,6 @@ export async function launchBrowser() {
     }
   }
   
-  if (!executablePath) {
-    console.log('⚠️ Chrome não encontrado no cache, deixando Puppeteer encontrar automaticamente');
-  }
-  
   const launchOptions = {
     headless: "new",
     args: [
@@ -421,13 +417,14 @@ export async function launchBrowser() {
     ],
   };
   
+  // Só adiciona executablePath se encontrou um caminho válido
   if (executablePath) {
     launchOptions.executablePath = executablePath;
     console.log(`📁 Usando Chrome em: ${executablePath}`);
   } else {
-    console.log('⚠️ Chrome não encontrado no cache, tentando usar padrão do Puppeteer');
-    // Não especifica executablePath - deixa o Puppeteer encontrar automaticamente
-    // O Puppeteer deve ter instalado o Chrome durante o build
+    console.log('⚠️ Chrome não encontrado no cache, usando Puppeteer padrão (sem executablePath)');
+    // IMPORTANTE: Não especifica executablePath - deixa o Puppeteer usar o Chrome que ele instalou
+    // O Puppeteer v22.13.0 deve ter instalado o Chrome durante o build via postinstall
   }
   
   console.log('📦 Launch options:', JSON.stringify({ 
@@ -436,11 +433,16 @@ export async function launchBrowser() {
     argsCount: launchOptions.args.length 
   }));
   
-  const browser = await puppeteer.launch(launchOptions);
+  try {
+    const browser = await puppeteer.launch(launchOptions);
+    console.log('✅ Puppeteer iniciado com sucesso');
+    return browser;
+  } catch (error) {
+    console.error('❌ Erro ao iniciar Puppeteer:', error.message);
+    console.error('❌ ExecutablePath usado:', executablePath || 'NENHUM (Puppeteer padrão)');
+    throw error;
+  }
   
-  console.log('✅ Puppeteer iniciado com sucesso');
-  return browser;
-}
 
 /** Wrapper para busca por query usando o novo sistema */
 export async function scrapeAmazonByQuery(query, country = 'uk') {
