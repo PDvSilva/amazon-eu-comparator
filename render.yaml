@@ -5,7 +5,7 @@ services:
     region: frankfurt
     plan: free
     buildCommand: npm install
-    startCommand: npm start
+    startCommand: node start.js
     envVars:
       - key: PORT
         value: 10000
