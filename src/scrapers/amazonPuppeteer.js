@@ -332,11 +332,46 @@ export async function launchBrowser() {
   console.log('🌐 Iniciando Puppeteer...');
   
   try {
-    // Configura o cache path do Puppeteer para Render
-    const cacheDir = process.env.PUPPETEER_CACHE_DIR || '/opt/render/.cache/puppeteer';
-    console.log(`📁 Cache dir: ${cacheDir}`);
+    // Tenta encontrar o Chrome em vários locais possíveis
+    const possiblePaths = [
+      process.env.PUPPETEER_EXECUTABLE_PATH,
+      '/usr/bin/google-chrome',
+      '/usr/bin/chromium',
+      '/usr/bin/chromium-browser',
+    ];
     
-    const browser = await puppeteer.launch({
+    let executablePath = undefined;
+    for (const path of possiblePaths) {
+      if (path) {
+        try {
+          const fs = await import('fs');
+          if (fs.existsSync(path)) {
+            executablePath = path;
+            console.log(`✅ Chrome encontrado em: ${path}`);
+            break;
+          }
+        } catch (e) {
+          // Ignora erro de import ou existsSync
+        }
+      }
+    }
+    
+    // Se não encontrou, tenta usar o Chrome do Puppeteer
+    if (!executablePath) {
+      try {
+        const puppeteerPath = await import('puppeteer');
+        const browserFetcher = puppeteerPath.default.createBrowserFetcher();
+        const revisionInfo = await browserFetcher.download('131.0.6778.204').catch(() => null);
+        if (revisionInfo && revisionInfo.executablePath) {
+          executablePath = revisionInfo.executablePath;
+          console.log(`✅ Chrome baixado pelo Puppeteer: ${executablePath}`);
+        }
+      } catch (e) {
+        console.warn('⚠️ Não foi possível baixar Chrome automaticamente:', e.message);
+      }
+    }
+    
+    const launchOptions = {
       headless: "new",
       args: [
         "--no-sandbox",
@@ -351,16 +386,24 @@ export async function launchBrowser() {
         "--disable-renderer-backgrounding",
         "--disable-backgrounding-occluded-windows",
       ],
-      timeout: 60000, // 60 segundos timeout
-      // Força o Puppeteer a usar o Chrome instalado
-      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined,
-    });
+      timeout: 60000,
+    };
+    
+    if (executablePath) {
+      launchOptions.executablePath = executablePath;
+      console.log(`📁 Usando Chrome em: ${executablePath}`);
+    } else {
+      console.log('⚠️ Usando Chrome padrão do sistema (Puppeteer vai tentar encontrar)');
+    }
+    
+    const browser = await puppeteer.launch(launchOptions);
     
     console.log('✅ Puppeteer iniciado com sucesso');
     return browser;
   } catch (error) {
     console.error('❌ Erro ao iniciar Puppeteer:', error.message);
-    console.error('❌ Dica: Certifique-se de que o Chrome foi instalado durante o build');
+    console.error('❌ Stack:', error.stack?.substring(0, 500));
+    console.error('❌ Dica: Verifique se o Chrome foi instalado durante o build');
     throw error;
   }
 }
