@@ -208,7 +208,16 @@ export async function scrapeAmazonSite({ domain, country, currency }, query, bro
       return null;
     }, domain);
 
-    if (!item) throw new Error("no priced item");
+    if (!item) {
+      console.warn(`⚠️ Nenhum item com preço encontrado em ${domain} para "${query}"`);
+      throw new Error("no priced item");
+    }
+    
+    console.log(`✅ Item encontrado em ${domain}:`, {
+      title: item.title?.substring(0, 50) + '...',
+      price: item.priceText,
+      hasImage: !!item.imageUrl
+    });
 
     // Constrói o link corretamente
     let link = null;

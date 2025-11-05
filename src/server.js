@@ -239,20 +239,28 @@ app.get("/compare", async (req, res) => {
     
     clearTimeout(timeout);
     
+    console.log(`📊 Resultados recebidos:`, results ? `${results.length} itens` : 'null');
+    
     if (!results || results.length === 0) {
       console.warn(`⚠️ Nenhum resultado encontrado para: ${q}`);
       return res.json([]);
     }
     
     console.log(`✅ ${results.length} resultados encontrados para: ${q}`);
+    console.log(`📦 Primeiro resultado:`, JSON.stringify(results[0]).substring(0, 200));
+    
     cache.set(q, { data: results, time: Date.now() });
     res.json(results);
   } catch (err) {
     clearTimeout(timeout);
     console.error(`❌ Erro no scraping para "${q}":`, err.message);
+    console.error(`❌ Erro name:`, err.name);
     console.error(`❌ Stack:`, err.stack);
     if (!res.headersSent) {
-      res.status(500).json({ error: "scrape_failed", message: err.message });
+      res.status(500).json({ 
+        error: "scrape_failed", 
+        message: err.message || "Erro desconhecido no scraping"
+      });
     }
   }
 });
