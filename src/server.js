@@ -182,13 +182,19 @@ app.get("/api/health", (req, res) => {
 // Error handler global
 process.on('uncaughtException', (error) => {
   console.error('❌ Uncaught Exception:', error);
+  process.exit(1);
 });
 
 process.on('unhandledRejection', (reason, promise) => {
   console.error('❌ Unhandled Rejection at:', promise, 'reason:', reason);
 });
 
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
-});
+try {
+  app.listen(PORT, "0.0.0.0", () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
+  });
+} catch (error) {
+  console.error('❌ Erro ao iniciar servidor:', error);
+  process.exit(1);
+}
