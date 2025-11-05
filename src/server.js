@@ -23,25 +23,9 @@ import pLimit from "p-limit";
 
 console.log('✅ Dependências básicas importadas');
 
-// Lazy import do Puppeteer - só importa quando necessário
-let launchBrowser, scrapeAmazonSite;
-async function loadScraper() {
-  if (!launchBrowser) {
-    console.log('📦 Carregando scraper (lazy)...');
-    try {
-      const scraperModule = await import("./scrapers/amazonPuppeteer.js");
-      launchBrowser = scraperModule.launchBrowser;
-      scrapeAmazonSite = scraperModule.scrapeAmazonSite;
-      console.log('✅ Scraper carregado com sucesso');
-      console.log('✅ launchBrowser:', typeof launchBrowser);
-      console.log('✅ scrapeAmazonSite:', typeof scrapeAmazonSite);
-    } catch (error) {
-      console.error('❌ Erro ao carregar scraper:', error);
-      throw error;
-    }
-  }
-  return { launchBrowser, scrapeAmazonSite };
-}
+// Import direto do Puppeteer (não lazy) - mais confiável
+import { launchBrowser, scrapeAmazonSite } from "./scrapers/amazonPuppeteer.js";
+console.log('✅ Scraper importado com sucesso');
 
 
 
@@ -137,23 +121,13 @@ async function toEUR(amount, from){
 async function runScrape(q) {
   console.log(`🚀 Iniciando scraping para: "${q}"`);
   
-  // Carrega o scraper apenas quando necessário
   let browser;
   try {
-    console.log('📥 Chamando loadScraper()...');
-    const { launchBrowser: lb, scrapeAmazonSite: sas } = await loadScraper();
-    console.log('📦 Scraper carregado, iniciando browser...');
-    console.log('📦 Tipo de lb:', typeof lb);
-    
-    if (typeof lb !== 'function') {
-      throw new Error('launchBrowser não é uma função');
-    }
-    
     console.log('🌐 Chamando launchBrowser()...');
     const browserStartTime = Date.now();
     
     browser = await Promise.race([
-      lb(),
+      launchBrowser(),
       new Promise((_, reject) => 
         setTimeout(() => {
           const elapsed = Date.now() - browserStartTime;
@@ -171,7 +145,7 @@ async function runScrape(q) {
     const tasks = SITES.map(site => limit(() => {
       console.log(`🔍 Scraping ${site.country} (${site.domain})...`);
       const startTime = Date.now();
-      return sas(site, q, browser)
+      return scrapeAmazonSite(site, q, browser)
         .then(result => {
           const elapsed = Date.now() - startTime;
           console.log(`✅ ${site.country} sucesso em ${elapsed}ms`);
