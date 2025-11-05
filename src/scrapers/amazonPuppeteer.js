@@ -332,6 +332,10 @@ export async function launchBrowser() {
   console.log('🌐 Iniciando Puppeteer...');
   
   try {
+    // Configura o cache path do Puppeteer para Render
+    const cacheDir = process.env.PUPPETEER_CACHE_DIR || '/opt/render/.cache/puppeteer';
+    console.log(`📁 Cache dir: ${cacheDir}`);
+    
     const browser = await puppeteer.launch({
       headless: "new",
       args: [
@@ -342,14 +346,21 @@ export async function launchBrowser() {
         "--single-process",
         "--disable-software-rasterizer",
         "--disable-extensions",
+        "--disable-background-networking",
+        "--disable-background-timer-throttling",
+        "--disable-renderer-backgrounding",
+        "--disable-backgrounding-occluded-windows",
       ],
       timeout: 60000, // 60 segundos timeout
+      // Força o Puppeteer a usar o Chrome instalado
+      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined,
     });
     
     console.log('✅ Puppeteer iniciado com sucesso');
     return browser;
   } catch (error) {
-    console.error('❌ Erro ao iniciar Puppeteer:', error);
+    console.error('❌ Erro ao iniciar Puppeteer:', error.message);
+    console.error('❌ Dica: Certifique-se de que o Chrome foi instalado durante o build');
     throw error;
   }
 }
