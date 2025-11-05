@@ -5,7 +5,7 @@
   "type": "module",
   "main": "src/server.js",
   "scripts": {
-    "start": "node src/server.js",
+    "start": "node test-minimal.js",
     "dev": "nodemon src/server.js"
   },
   "dependencies": {
