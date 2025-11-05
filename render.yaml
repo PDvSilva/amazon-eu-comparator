@@ -5,6 +5,7 @@ services:
     plan: free
     region: frankfurt
     buildCommand: |
+      rm -rf /opt/render/.cache/puppeteer
       npm install
       npx puppeteer browsers install chrome
     startCommand: npm start
@@ -13,3 +14,4 @@ services:
         value: 10000
       - key: PUPPETEER_CACHE_DIR
         value: /opt/render/.cache/puppeteer
+
