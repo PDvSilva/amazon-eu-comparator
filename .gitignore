@@ -11,3 +11,11 @@ logs/
 .env.local
 dist/
 build/
+
+# Arquivos temporários
+Available
+Deploying...
+Running
+Your
+*.pid
+*.lock
