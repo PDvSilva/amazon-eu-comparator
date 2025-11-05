@@ -150,13 +150,20 @@ async function runScrape(q) {
     }
     
     console.log('🌐 Chamando launchBrowser()...');
+    const browserStartTime = Date.now();
+    
     browser = await Promise.race([
       lb(),
       new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Puppeteer timeout após 30s')), 30000)
+        setTimeout(() => {
+          const elapsed = Date.now() - browserStartTime;
+          reject(new Error(`Puppeteer timeout após ${elapsed}ms`));
+        }, 45000) // 45 segundos
       )
     ]);
-    console.log('✅ Browser iniciado');
+    
+    const browserInitTime = Date.now() - browserStartTime;
+    console.log(`✅ Browser iniciado em ${browserInitTime}ms`);
     
     const limit = pLimit(2); // limitar concorrência para evitar bloqueios
 
@@ -219,8 +226,18 @@ app.get("/compare", async (req, res) => {
 
   console.log(`🔍 Scraping novo para: ${q}`);
   
+  // Timeout de 2 minutos para a requisição completa
+  const timeout = setTimeout(() => {
+    console.error(`⏱️ Timeout de 2 minutos atingido para: ${q}`);
+    if (!res.headersSent) {
+      res.status(504).json({ error: "timeout", message: "Scraping demorou mais que 2 minutos" });
+    }
+  }, 120000); // 2 minutos
+  
   try {
     const results = await runScrape(q);
+    
+    clearTimeout(timeout);
     
     if (!results || results.length === 0) {
       console.warn(`⚠️ Nenhum resultado encontrado para: ${q}`);
@@ -231,9 +248,12 @@ app.get("/compare", async (req, res) => {
     cache.set(q, { data: results, time: Date.now() });
     res.json(results);
   } catch (err) {
+    clearTimeout(timeout);
     console.error(`❌ Erro no scraping para "${q}":`, err.message);
     console.error(`❌ Stack:`, err.stack);
-    res.status(500).json({ error: "scrape_failed", message: err.message });
+    if (!res.headersSent) {
+      res.status(500).json({ error: "scrape_failed", message: err.message });
+    }
   }
 });
 
