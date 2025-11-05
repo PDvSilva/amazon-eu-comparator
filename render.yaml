@@ -2,12 +2,17 @@ services:
   - type: web
     name: amazon-eu-comparator
     env: node
-    region: frankfurt  # ou o mais próximo de ti
+    region: frankfurt
     plan: free
     buildCommand: npm install
     startCommand: npm start
     envVars:
       - key: PORT
         value: 10000
+      - key: NODE_ENV
+        value: production
+      - key: PUPPETEER_SKIP_CHROMIUM_DOWNLOAD
+        value: "false"
+    healthCheckPath: /api/health
 
 
