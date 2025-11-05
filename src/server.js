@@ -1,3 +1,4 @@
+// Server version: 1.0.0 - Deploy trigger
 // Log inicial para debug - DEVE aparecer primeiro
 process.stdout.write('SERVER: Starting...\n');
 process.stderr.write('SERVER: Starting (stderr)\n');
