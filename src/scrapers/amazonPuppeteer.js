@@ -341,24 +341,25 @@ export async function scrapeAmazonSite({ domain, country, currency }, query, bro
 
 /** Arranca um browser único e devolve função de fecho */
 export async function launchBrowser() {
-  console.log("🚀 Starting Puppeteer on Render (embedded Chrome)...");
-
-  const browser = await puppeteer.launch({
-    headless: true,
-    args: [
-      "--no-sandbox",
-      "--disable-setuid-sandbox",
-      "--disable-dev-shm-usage",
-      "--disable-gpu",
-      "--single-process",
-      "--no-zygote",
-    ],
-  });
-
-  const version = await browser.version();
-  console.log("✅ Chrome iniciado com versão:", version);
-
-  return browser;
+  console.log("🚀 Starting Puppeteer on Render (auto Chrome install)...");
+  try {
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-gpu',
+        '--no-zygote',
+        '--single-process'
+      ],
+    });
+    console.log("✅ Chrome iniciado com sucesso!");
+    return browser;
+  } catch (error) {
+    console.error("❌ Erro ao iniciar Puppeteer:", error);
+    throw error;
+  }
 }
 
 /** Wrapper para busca por query usando o novo sistema */
