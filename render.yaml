@@ -5,14 +5,12 @@ services:
     region: frankfurt
     plan: free
     buildCommand: npm install
-    startCommand: npm start
+    startCommand: node server-minimal.js
     envVars:
       - key: PORT
         value: 10000
       - key: NODE_ENV
         value: production
-      - key: PUPPETEER_SKIP_CHROMIUM_DOWNLOAD
-        value: "false"
     healthCheckPath: /health
 
 
