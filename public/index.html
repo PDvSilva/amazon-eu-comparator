@@ -919,8 +919,11 @@
       <div class="loading">
         <div class="loading-content">
           <div class="spinner"></div>
-          <div class="loading-text">Hunting for the best prices...</div>
-          <div class="loading-subtext">This may take 30-60 seconds</div>
+          <div class="loading-text">Buscando os melhores preços...</div>
+          <div class="loading-subtext">Isso pode levar 30-60 segundos</div>
+          <div class="loading-progress">
+            <div class="progress-bar"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -990,9 +993,29 @@
         displayResults(data, query);
 
       } catch (error) {
+        let errorMessage = error.message;
+        let suggestion = '';
+        
+        // Mensagens de erro mais amigáveis
+        if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+          errorMessage = 'Não foi possível conectar ao servidor';
+          suggestion = 'Verifique sua conexão ou tente novamente em alguns instantes.';
+        } else if (error.message.includes('timeout')) {
+          errorMessage = 'A busca está demorando mais que o esperado';
+          suggestion = 'Tente novamente ou use uma busca mais específica.';
+        } else if (error.message.includes('scrape_failed')) {
+          errorMessage = 'Não foi possível buscar os preços no momento';
+          suggestion = 'Tente novamente em alguns instantes.';
+        }
+        
         document.getElementById('results').innerHTML = `
           <div class="error-message">
-            <strong>❌ Erro:</strong> ${error.message}
+            <div class="error-icon">⚠️</div>
+            <div class="error-content">
+              <strong>${errorMessage}</strong>
+              ${suggestion ? `<p class="error-suggestion">${suggestion}</p>` : ''}
+              <button class="retry-btn" onclick="searchProducts('${query}')">🔄 Tentar Novamente</button>
+            </div>
           </div>
         `;
       } finally {
@@ -1006,8 +1029,12 @@
       
       if (!data || data.length === 0) {
         resultsDiv.innerHTML = `
-          <div class="error-message">
-            Nenhum preço encontrado. O produto pode não estar disponível nos países selecionados.
+          <div class="error-message" style="background: linear-gradient(135deg, hsl(210, 20%, 60%), hsl(210, 20%, 55%));">
+            <div class="error-icon">🔍</div>
+            <div class="error-content">
+              <strong>Nenhum preço encontrado</strong>
+              <p class="error-suggestion">O produto pode não estar disponível nos países selecionados. Tente uma busca diferente ou verifique se o nome do produto está correto.</p>
+            </div>
           </div>
         `;
         document.getElementById('features').style.display = 'grid';
