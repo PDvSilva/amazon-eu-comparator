@@ -50,6 +50,12 @@ const PORT = process.env.PORT || 10000;
 
 const cache = new Map(); // Cache para armazenar resultados
 
+// Endpoint para limpar cache (útil para debug)
+app.get("/clear-cache", (req, res) => {
+  cache.clear();
+  res.json({ message: "Cache limpo" });
+});
+
 // Configuração de afiliados Amazon (substitua pelos seus IDs reais)
 const AFFILIATE_TAGS = {
   'es': process.env.AMAZON_AFFILIATE_ES || 'dogshoppt-21',
@@ -93,6 +99,82 @@ function addAffiliateTag(url, tag) {
 }
 
 
+
+/** Agrupa produtos similares (mesmo modelo base) */
+function groupSimilarProducts(results) {
+  const groups = new Map();
+  
+  for (const result of results) {
+    // Extrai modelo base do título (remove variações de cor, memória, etc)
+    const baseModel = extractBaseModel(result.title);
+    const key = baseModel.toLowerCase().trim();
+    
+    if (!groups.has(key)) {
+      groups.set(key, {
+        baseModel: baseModel,
+        products: [],
+        bestPrice: Infinity,
+        bestPriceIndex: -1
+      });
+    }
+    
+    const group = groups.get(key);
+    group.products.push(result);
+    
+    // Atualiza melhor preço
+    if (result.priceEUR < group.bestPrice) {
+      group.bestPrice = result.priceEUR;
+      group.bestPriceIndex = group.products.length - 1;
+    }
+  }
+  
+  // Converte Map para Array e marca o melhor preço
+  return Array.from(groups.values()).map(group => {
+    if (group.bestPriceIndex >= 0) {
+      group.products[group.bestPriceIndex].isBestPrice = true;
+    }
+    // Ordena produtos dentro do grupo por preço
+    group.products.sort((a, b) => a.priceEUR - b.priceEUR);
+    return group;
+  });
+}
+
+/** Extrai modelo base do título (remove cores, memórias específicas) */
+function extractBaseModel(title) {
+  if (!title) return 'Unknown';
+  
+  // Remove padrões comuns de variações
+  let model = title
+    .replace(/\s*\([^)]*\)/g, '') // Remove parênteses
+    .replace(/\s*\[[^\]]*\]/g, '') // Remove colchetes
+    .trim();
+  
+  // Tenta extrair modelo principal (ex: "iPhone 16", "MacBook Pro 14")
+  const modelPatterns = [
+    /(iPhone\s+\d+[a-z]?)/i,
+    /(iPad\s+\w+)/i,
+    /(MacBook\s+\w+)/i,
+    /(AirPods\s+\w+)/i,
+    /(PlayStation\s+\d+)/i,
+    /(Nintendo\s+Switch)/i,
+    /(Samsung\s+Galaxy\s+\w+)/i
+  ];
+  
+  for (const pattern of modelPatterns) {
+    const match = title.match(pattern);
+    if (match) {
+      return match[1];
+    }
+  }
+  
+  // Se não encontrou padrão, pega primeiras palavras (marca + modelo)
+  const words = model.split(/\s+/);
+  if (words.length > 3) {
+    return words.slice(0, 3).join(' ');
+  }
+  
+  return model;
+}
 
 /** conversão para EUR usando exchangerate.host */
 
@@ -140,26 +222,28 @@ async function runScrape(q) {
     const browserInitTime = Date.now() - browserStartTime;
     console.log(`✅ Browser iniciado em ${browserInitTime}ms`);
     
-    const limit = pLimit(2); // limitar concorrência para evitar bloqueios
+    const limit = pLimit(5); // Aumentar concorrência para 5 (um por site) para ser mais rápido
 
     console.log(`🌍 Iniciando scraping em ${SITES.length} sites...`);
-    const tasks = SITES.map(site => limit(() => {
+    const tasks = SITES.map(site => limit(async () => {
       console.log(`🔍 Scraping ${site.country} (${site.domain})...`);
       const startTime = Date.now();
-      return scrapeAmazonSite(site, q, browser)
-        .then(result => {
-          const elapsed = Date.now() - startTime;
-          console.log(`✅ ${site.country} sucesso em ${elapsed}ms`);
-          return result;
-        })
-        .catch(err => {
-          const elapsed = Date.now() - startTime;
-          console.warn(`⚠️ ${site.country} falhou após ${elapsed}ms: ${err.message}`);
-          if (err.stack) {
-            console.warn(`⚠️ Stack: ${err.stack.substring(0, 200)}`);
-          }
-          return null;
-        });
+      try {
+        // Timeout de 10s por site para garantir que não demore muito
+        const result = await Promise.race([
+          scrapeAmazonSite(site, q, browser),
+          new Promise((_, reject) => 
+            setTimeout(() => reject(new Error(`Timeout após 10s`)), 10000)
+          )
+        ]);
+        const elapsed = Date.now() - startTime;
+        console.log(`✅ ${site.country} sucesso em ${elapsed}ms`);
+        return result;
+      } catch (err) {
+        const elapsed = Date.now() - startTime;
+        console.warn(`⚠️ ${site.country} falhou após ${elapsed}ms: ${err.message}`);
+        return null;
+      }
     }));
 
     const raw = (await Promise.all(tasks)).filter(Boolean);
@@ -199,9 +283,25 @@ async function runScrape(q) {
     const validResults = raw.filter(r => r.priceEUR && r.priceEUR > 0 && r.link);
     console.log(`✅ ${validResults.length} resultados válidos após processamento`);
     
-    validResults.sort((a, b) => a.priceEUR - b.priceEUR);
+    // Agrupa produtos similares (mesmo modelo base)
+    console.log(`🔄 Agrupando ${validResults.length} produtos...`);
+    const grouped = groupSimilarProducts(validResults);
+    console.log(`📦 ${grouped.length} grupos de produtos similares criados`);
     
-    return validResults;
+    // Valida estrutura dos grupos
+    if (grouped.length > 0) {
+      console.log(`✅ Estrutura do primeiro grupo:`, {
+        baseModel: grouped[0].baseModel,
+        productsCount: grouped[0].products?.length || 0,
+        hasProductsArray: Array.isArray(grouped[0].products),
+        bestPrice: grouped[0].bestPrice
+      });
+    }
+    
+    // Ordena grupos pelo melhor preço
+    grouped.sort((a, b) => a.bestPrice - b.bestPrice);
+    
+    return grouped;
   } catch (err) {
     console.error("❌ Erro no runScrape:", err.message);
     console.error("❌ Stack:", err.stack);
@@ -226,7 +326,15 @@ app.get("/compare", async (req, res) => {
   // Verifica cache (válido por 15 minutos)
   if (cache.has(q) && Date.now() - cache.get(q).time < 15 * 60 * 1000) {
     console.log(`✅ Cache hit para: ${q}`);
-    return res.json(cache.get(q).data);
+    const cachedData = cache.get(q).data;
+    // Garante que dados do cache estão no formato de grupos
+    if (cachedData && cachedData.length > 0 && cachedData[0].products && Array.isArray(cachedData[0].products)) {
+      return res.json(cachedData);
+    } else {
+      // Se cache tem formato antigo, limpa e faz nova busca
+      console.log(`⚠️ Cache com formato antigo, limpando...`);
+      cache.delete(q);
+    }
   }
 
   console.log(`🔍 Scraping novo para: ${q}`);
@@ -251,8 +359,20 @@ app.get("/compare", async (req, res) => {
       return res.json([]);
     }
     
-    console.log(`✅ ${results.length} resultados encontrados para: ${q}`);
-    console.log(`📦 Primeiro resultado:`, JSON.stringify(results[0]).substring(0, 200));
+    console.log(`✅ ${results.length} grupos encontrados para: ${q}`);
+    if (results[0]) {
+      console.log(`📦 Primeiro grupo:`, {
+        baseModel: results[0].baseModel,
+        productsCount: results[0].products?.length || 0,
+        bestPrice: results[0].bestPrice
+      });
+    }
+    
+    // Garante que está retornando grupos
+    if (!results[0]?.products || !Array.isArray(results[0].products)) {
+      console.error(`❌ ERRO: Resultados não estão no formato de grupos!`);
+      console.error(`❌ Estrutura recebida:`, results[0]);
+    }
     
     cache.set(q, { data: results, time: Date.now() });
     res.json(results);

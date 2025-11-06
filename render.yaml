@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: amazon-eu-comparator
+    name: firstlookprice
     env: node
     plan: free
     region: frankfurt
@@ -10,7 +10,7 @@ services:
       - key: PORT
         value: 10000
       - key: PUPPETEER_SKIP_CHROMIUM_DOWNLOAD
-        value: "false"
+        value: "true"
       - key: PUPPETEER_CACHE_DIR
         value: "/tmp/.puppeteer_cache"
       - key: NODE_ENV

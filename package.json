@@ -1,12 +1,13 @@
 {
-  "name": "amazon-eu-comparator",
+  "name": "firstlookprice",
   "version": "1.0.0",
-  "description": "Comparador de preços Amazon (ES, FR, DE, IT, UK) com Puppeteer",
+  "description": "FirstLookPrice - Comparador de preços Amazon (ES, FR, DE, IT, UK) com Puppeteer",
   "type": "module",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "nodemon src/server.js"
+    "dev": "nodemon src/server.js",
+    "postinstall": "node -e \"console.log('✅ Dependências instaladas')\""
   },
   "dependencies": {
     "axios": "^1.7.4",
