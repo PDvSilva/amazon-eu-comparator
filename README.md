@@ -1,6 +1,6 @@
-# Amazon EU Price Comparator
+# FirstLookPrice - Amazon EU Price Comparator
 
-Compare Amazon product prices across different European marketplaces using web scraping with Puppeteer.
+Compare Amazon product prices across different European marketplaces using web scraping with Puppeteer. Find the best deals instantly across EU countries.
 
 ## Features
 
@@ -19,7 +19,7 @@ Compare Amazon product prices across different European marketplaces using web s
 
 2. **Create a `.env` file** (optional):
    ```
-   PORT=3000
+   PORT=10000
    USER_AGENT=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36
    ```
 
@@ -29,13 +29,14 @@ Compare Amazon product prices across different European marketplaces using web s
    ```
 
 4. **Open your browser:**
-   Navigate to `http://localhost:3000`
+   Navigate to `http://localhost:10000`
 
 ## Usage
 
-1. Enter an Amazon ASIN (found in the product URL: `amazon.co.uk/dp/ASIN`)
-2. Select one or more EU countries to compare
-3. Click "Compare Prices" to see results across all selected marketplaces
+1. Enter a product name or search query (e.g., "iPhone 15", "PS5")
+2. The app automatically searches across all EU countries (ES, FR, DE, IT, UK)
+3. Compare prices and find the best deal instantly
+4. Click "Buy Now" to purchase from the cheapest marketplace
 
 ## API Endpoints
 
