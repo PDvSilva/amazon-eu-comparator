@@ -6,8 +6,7 @@
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "nodemon src/server.js",
-    "postinstall": "node -e \"console.log('✅ Dependências instaladas')\""
+    "dev": "nodemon src/server.js"
   },
   "dependencies": {
     "axios": "^1.7.4",
